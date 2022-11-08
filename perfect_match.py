@@ -106,37 +106,43 @@ def fetch_asctb(sheet_id,asctb_sheet_name):
 # i and j are the index pointing to corresponding row in Azimuth and ASCT+B dataframe respectively. 
 # i is the row number of cl_az in Azimuth dataframe.
 # j points to the row number in ASCT+B where cl_az matches in ASCT+B.
-# az_row_matched,asctb_row_matched are global lists used to store these the row number of Azimuth, ASCT+B 
+# az_row_matched_index,asctb_row_matched_index are global lists used to store these the row number of Azimuth, ASCT+B 
 
 # not_matching_az is a list storing index of Azimuth CT(label_az) that does not match to any CT in ASCT+B. 
-# And if there is a match then we append azimuth row to the list az_row_matched and corresponding ASCT+B row number 
-# to asctb_row_matched
+# And if there is a match then we append azimuth row to the list az_row_matched_index and corresponding ASCT+B row number 
+# to asctb_row_matched_index
 
 
-def check_in_asctb(label_az,i,asctb_all_cts_label_unique,az_row_matched,asctb_row_matched,not_matching_az):    
+def check_in_asctb(label_az,i,asctb_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_az):    
     
     flag=0
-    label_az_cleaned = re.sub(r"[^a-zA-Z0-9 ]","",label_az) #removed special character from label_az
-    label_az_lower_nospace = label_az_cleaned.strip().lower().replace(" ", "") #trimmed and converted into lower case
+    #removed special character from label_az
+    label_az_cleaned = re.sub(r"[^a-zA-Z0-9 ]","",label_az) 
+    #trimmed and converted into lower case
+    label_az_lower_nospace = label_az_cleaned.strip().lower().replace(" ", "") 
 
     for j in range(len(asctb_all_cts_label_unique['CT/LABEL'])):
-
-        asctb_label_cleaned= re.sub(r"[^a-zA-Z0-9 ]","",asctb_all_cts_label_unique['CT/LABEL'][j]) #removed special character from asctb label
-        asctb_label_lower_nospace = asctb_label_cleaned.strip().lower().replace(" ", "") #trimmed and converted into lower case
+         #removed special character from asctb label
+        asctb_label_cleaned= re.sub(r"[^a-zA-Z0-9 ]","",asctb_all_cts_label_unique['CT/LABEL'][j])
+         #trimmed and converted into lower case
+        asctb_label_lower_nospace = asctb_label_cleaned.strip().lower().replace(" ", "")
         
         if label_az_lower_nospace == asctb_label_lower_nospace:
-            az_row_matched.append(i) # direct matching label_az with astcb label 
-            asctb_row_matched.append(j)
+            # direct matching label_az with astcb label 
+            az_row_matched_index.append(i) 
+            asctb_row_matched_index.append(j)
             flag=1
 
         elif label_az_lower_nospace ==asctb_label_lower_nospace[:-1]:
-            az_row_matched.append(i) #direct matching label_az with astcb label with removing last element in case 's' in asctb label is the last element like Label: "Cell's'"
-            asctb_row_matched.append(j)
+            #direct matching label_az with astcb label with removing last element in case 's' in asctb label is the last element like Label: "Cell's'"
+            az_row_matched_index.append(i) 
+            asctb_row_matched_index.append(j)
             flag=1
 
         elif label_az_lower_nospace[:-1] == asctb_label_lower_nospace:
-            az_row_matched.append(i) #direct matching label_az with astcb label with removing last element in case 's' in label_az is the last element like Label: "Cell's'"
-            asctb_row_matched.append(j)
+            #direct matching label_az with astcb label with removing last element in case 's' in label_az is the last element like Label: "Cell's'"
+            az_row_matched_index.append(i) 
+            asctb_row_matched_index.append(j)
             flag=1
         
     if flag==0:
@@ -144,23 +150,23 @@ def check_in_asctb(label_az,i,asctb_all_cts_label_unique,az_row_matched,asctb_ro
 
 def perfect_match_for_azimuthct_in_asctb(azimuth_all_cts_label_unique,asctb_all_cts_label_unique):
     
-    # az_row_matched ,asctb_row_matched List to store index number of ASCTB, Azimuth row number where a match is occuring
+    # az_row_matched_index ,asctb_row_matched_index List to store index number of ASCTB, Azimuth row number where a match is occuring
     # not_matching_az list stores Azimuth row number where CT/LABEL match is not found
     
-    az_row_matched=[]
-    asctb_row_matched=[]
+    az_row_matched_index=[]
+    asctb_row_matched_index=[]
     not_matching_az=[]
 
     for i in range(len(azimuth_all_cts_label_unique['CT/LABEL'])):  
 
         if azimuth_all_cts_label_unique['CT/LABEL'][i]!="":
-            check_in_asctb(azimuth_all_cts_label_unique['CT/LABEL'][i],i,asctb_all_cts_label_unique,az_row_matched,asctb_row_matched,not_matching_az)
+            check_in_asctb(azimuth_all_cts_label_unique['CT/LABEL'][i],i,asctb_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_az)
         else:
             not_matching_az.append(i)
     
     # Subset Azimuth and ASCTB dataframe by rows were a match is found.
-    az_matches_all=azimuth_all_cts_label_unique.loc[az_row_matched]
-    asctb_matches_all=asctb_all_cts_label_unique.loc[asctb_row_matched]
+    az_matches_all=azimuth_all_cts_label_unique.loc[az_row_matched_index]
+    asctb_matches_all=asctb_all_cts_label_unique.loc[asctb_row_matched_index]
 
     az_matches_all.reset_index(drop=True,inplace=True)
     asctb_matches_all.reset_index(drop=True,inplace=True)
@@ -188,37 +194,43 @@ def perfect_match_for_azimuthct_in_asctb(azimuth_all_cts_label_unique,asctb_all_
 # i and j are the index(row number) pointing to corresponding row in ASCT+B and Azimuth dataframe respectively. 
 # i is the row number of label_asctb in Azimuth dataframe.
 # j points to the row number in azimuth where label_asctb matches in Azimuth.
-# az_row_matched,asctb_row_matched are global lists used to store these the row number of Azimuth, ASCT+B 
+# az_row_matched_index,asctb_row_matched_index are global lists used to store these the row number of Azimuth, ASCT+B 
 
 # not_matching_asctb is a list storing index of Asctb CT(label_asctb) that does not match to any CT in Azimuth. 
-# And if there is a match then we append Asctb row to the list asctb_row_matched and corresponding Azimuth row number 
-# to az_row_matched
-def check_in_az(label_asctb,i,az_all_cts_label_unique,az_row_matches,asctb_row_matches,not_matching_asctb):    
+# And if there is a match then we append Asctb row to the list asctb_row_matched_index and corresponding Azimuth row number 
+# to az_row_matched_index
+def check_in_az(label_asctb,i,az_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_asctb):    
     
     flag=0
-    label_asctb_cleaned = re.sub(r"[^a-zA-Z0-9 ]","",label_asctb) #removed add special character from label_asctb
-    label_asctb_lower_nospace = label_asctb_cleaned.strip().lower().replace(" ", "") #trimmed and converted into lower case
+    #removed add special character from label_asctb
+    label_asctb_cleaned = re.sub(r"[^a-zA-Z0-9 ]","",label_asctb) 
+    #trimmed and converted into lower case
+    label_asctb_lower_nospace = label_asctb_cleaned.strip().lower().replace(" ", "") 
     
     for j in range(len(az_all_cts_label_unique['CT/LABEL'])):
-        
-        az_label_cleaned= re.sub(r"[^a-zA-Z0-9 ]","",az_all_cts_label_unique['CT/LABEL'][j]) #removed special character from azimuth label
-        az_label_lower_nospace = az_label_cleaned.strip().lower().replace(" ", "") #trimmed and converted into lower case
-        
+        #removed special character from azimuth label
+        az_label_cleaned= re.sub(r"[^a-zA-Z0-9 ]","",az_all_cts_label_unique['CT/LABEL'][j]) 
+        #trimmed and converted into lower case
+        az_label_lower_nospace = az_label_cleaned.strip().lower().replace(" ", "") 
+
         if label_asctb_lower_nospace == az_label_lower_nospace:
-            az_row_matches.append(j) # direct matching label_asctb with azimuth label
-            asctb_row_matches.append(i)
+            # direct matching label_asctb with azimuth label
+            az_row_matched_index.append(j) 
+            asctb_row_matched_index.append(i)
             flag=1
             break
         
         elif label_asctb_lower_nospace == az_label_lower_nospace[:-1]:
-            az_row_matches.append(j) #direct matching label_asctb with azimuth label with removing last element in case 's' in azimuth label is the last element like Label: "Cell's'"
-            asctb_row_matches.append(i)
+            #direct matching label_asctb with azimuth label with removing last element in case 's' in azimuth label is the last element like Label: "Cell's'"
+            az_row_matched_index.append(j) 
+            asctb_row_matched_index.append(i)
             flag=1
             break
         
         elif label_asctb_lower_nospace[:-1] == az_label_lower_nospace:
-            az_row_matches.append(j) #direct matching label_asctb with azimuth label with removing last element in case 's' in label_asctb is the last element like Label: "Cell's'"
-            asctb_row_matches.append(i)
+            #direct matching label_asctb with azimuth label with removing last element in case 's' in label_asctb is the last element like Label: "Cell's'"
+            az_row_matched_index.append(j) 
+            asctb_row_matched_index.append(i)
             flag=1
             break
 
@@ -228,19 +240,19 @@ def check_in_az(label_asctb,i,az_all_cts_label_unique,az_row_matches,asctb_row_m
 # Check for mismatches between ASCT+B and Azimuth tables and return Asctb CT mismatches
 def perfect_match_for_asctbct_in_azimuth(azimuth_all_cts_label_unique,asctb_all_cts_label_unique):
     
-    az_row_matches=[]
-    asctb_row_matches=[]
+    az_row_matched_index=[]
+    asctb_row_matched_index=[]
     not_matching_asctb=[]
 
     for i in range(len(asctb_all_cts_label_unique['CT/LABEL'])):
-        
+
         if asctb_all_cts_label_unique['CT/LABEL'][i]!="":
-            check_in_az(asctb_all_cts_label_unique['CT/LABEL'][i],i,azimuth_all_cts_label_unique,az_row_matches,asctb_row_matches,not_matching_asctb)
+            check_in_az(asctb_all_cts_label_unique['CT/LABEL'][i],i,azimuth_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_asctb)
         else:
             not_matching_asctb.append(i)
 
-    az_matches=azimuth_all_cts_label_unique.loc[az_row_matches]
-    asctb_matches=asctb_all_cts_label_unique.loc[asctb_row_matches]
+    az_matches=azimuth_all_cts_label_unique.loc[az_row_matched_index]
+    asctb_matches=asctb_all_cts_label_unique.loc[asctb_row_matched_index]
 
     az_matches.reset_index(drop=True,inplace=True)
     asctb_matches.reset_index(drop=True,inplace=True)
