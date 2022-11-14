@@ -33,45 +33,45 @@ SELECT DISTINCT ?cell ?cell_label ?cell_description ?cell_definition ?parent_cel
     ?cell synonym: ?synonym .
 }}"""
 qres = g.query(knows_query)
-print(qres) #checking query returned object
+"""print(qres) #checking query returned object
 import pandas as pd
 b = pd.DataFrame(qres, columns= qres.vars) #converting it into dataframe
-c=0
+c=0"""
 import re
-cellLabel = 'MC(T)'
+cellLabel = 'brush cell of epithelium of trachea'
 cellLabel1 = re.sub(r"[^a-zA-Z0-9 ]","",cellLabel) #removing spaces and special characters
 c=0
-for row in b.iterrows():
-    rs= re.sub(r"[^a-zA-Z0-9 ]","",row[1][1])
-    rsy = re.sub(r"[^a-zA-Z0-9 ]","",row[1][6])
-    if cellLabel.strip().lower().replace(" ", "") == row[1][1].strip().lower().replace(" ", ""):
+for row in qres:
+    rs= re.sub(r"[^a-zA-Z0-9 ]","",row.cell_label)
+    rsy = re.sub(r"[^a-zA-Z0-9 ]","",row.synonym)
+    if cellLabel.strip().lower().replace(" ", "") == row.cell_label.strip().lower().replace(" ", ""):
         #print(row[1])
-        print(row[1][5]) #direct matching and returning parents
+        print(row.parent_label) #direct matching and returning parents
         c+=1
-    elif cellLabel.strip().lower().replace(" ", "") == row[1][1][:-1].strip().lower().replace(" ", ""):
-        print(row[1][5])
+    elif cellLabel.strip().lower().replace(" ", "") == row.cell_label[:-1].strip().lower().replace(" ", ""):
+        print(row.parent_label)
         c+=1
-    elif cellLabel[:-1].strip().lower().replace(" ", "") == row[1][1].strip().lower().replace(" ", ""):
-        print(row[1][5])
+    elif cellLabel[:-1].strip().lower().replace(" ", "") == row.cell_label.strip().lower().replace(" ", ""):
+        print(row.parent_label)
         c+=1
     elif cellLabel1.strip().lower().replace(" ", "") == rs.strip().lower().replace(" ", ""):
         #print(row[1])
-        print(row[1][5])
+        print(row.parent_label)
         c+=1
     elif cellLabel1.strip().lower().replace(" ", "") == rs[:-1].strip().lower().replace(" ", ""):
-        print(row[1][5])
+        print(row.parent_label)
         c+=1
     elif cellLabel1[:-1].strip().lower().replace(" ", "") == rs.strip().lower().replace(" ", ""):
-        print(row[1][5])
+        print(row.parent_label)
         c+=1
-    elif cellLabel.strip().lower().replace(" ", "") == row[1][6].strip().lower().replace(" ", ""): #direct matching with synonyms
+    elif cellLabel.strip().lower().replace(" ", "") == row.synonym.strip().lower().replace(" ", ""): #direct matching with synonyms
         #print(row[1])
-        print(row[1][5])
+        print(row.parent_label)
         c+=1
-    elif cellLabel.strip().lower().replace(" ", "") == row[1][6][:-1].strip().lower().replace(" ", ""):
-        print(row[1][5])
+    elif cellLabel.strip().lower().replace(" ", "") == row.synonym[:-1].strip().lower().replace(" ", ""):
+        print(row.parent_label)
         c+=1
-    elif cellLabel[:-1].strip().lower().replace(" ", "") == row[1][6].strip().lower().replace(" ", ""):
-        print(row[1][5])
+    elif cellLabel[:-1].strip().lower().replace(" ", "") == row.synonym.strip().lower().replace(" ", ""):
+        print(row.parent_label)
         c+=1
 print(c)
