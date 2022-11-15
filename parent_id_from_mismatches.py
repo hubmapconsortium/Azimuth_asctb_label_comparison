@@ -451,7 +451,7 @@ def parent_id_for_mismatches(mismatches, ubergraph_responses):
         break
     return parents'''
 
-
+ubergraph_response = ubergraph_responses()
 for ref in config['references']:
     
     name= ref['name']
@@ -481,7 +481,6 @@ for ref in config['references']:
     #(azimuth_perfect_matches)
     print("\n")
     print(asctb_mismatches)
-    ubergraph_response = ubergraph_responses()
     #finding parents
     parents = parent_id_for_mismatches(asctb_mismatches, ubergraph_response)
 #print(azimuth_all_cts_label_unique)  
