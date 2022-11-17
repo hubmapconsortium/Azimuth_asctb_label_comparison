@@ -146,6 +146,16 @@ def check_in_asctb(label_az,i,asctb_all_cts_label_unique,az_row_matched_index,as
             az_row_matched_index.append(i) 
             asctb_row_matched_index.append(j)
             flag=1
+        elif label_az_lower_nospace in asctb_label_lower_nospace:
+            # direct matching label_az with astcb label 
+            az_row_matched_index.append(i) 
+            asctb_row_matched_index.append(j)
+            flag=1
+        elif asctb_label_lower_nospace in label_az_lower_nospace:
+            # direct matching label_az with astcb label 
+            az_row_matched_index.append(i) 
+            asctb_row_matched_index.append(j)
+            flag=1
         
     if flag==0:
         not_matching_az.append(i)
@@ -231,6 +241,18 @@ def check_in_az(label_asctb,i,az_all_cts_label_unique,az_row_matched_index,asctb
         
         elif label_asctb_lower_nospace[:-1] == az_label_lower_nospace:
             #direct matching label_asctb with azimuth label with removing last element in case 's' in label_asctb is the last element like Label: "Cell's'"
+            az_row_matched_index.append(j) 
+            asctb_row_matched_index.append(i)
+            flag=1
+            break
+        elif label_asctb_lower_nospace in az_label_lower_nospace:
+            # direct matching label_asctb with azimuth label
+            az_row_matched_index.append(j) 
+            asctb_row_matched_index.append(i)
+            flag=1
+            break
+        elif az_label_lower_nospace in label_asctb_lower_nospace:
+            # direct matching label_asctb with azimuth label
             az_row_matched_index.append(j) 
             asctb_row_matched_index.append(i)
             flag=1
@@ -328,102 +350,102 @@ def parent_id_for_mismatches(mismatches, ubergraph_responses):
             ubergraph_synonyms_lower_nospace = cleaned_ubergraph_synonyms.strip().lower().replace(" ", "")
 
             if mismatches_label_lower_nospace == ubergraph_cell_label_lower_nospace:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #direct match with cell labels
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_lower_nospace == ubergraph_cell_label_lower_nospace[:-1]:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #matching with removing last character from ontology label
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_lower_nospace[:-1] == ubergraph_cell_label_lower_nospace:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #matching with removing last character from asctb label
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_lower_nospace == ubergraph_synonyms_lower_nospace:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #direct match with asctb labels and ubergraph synonyms
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_lower_nospace == ubergraph_synonyms_lower_nospace[:-1]:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #matching with removing last character from ubergraph synonyms
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_lower_nospace[:-1] == ubergraph_synonyms_lower_nospace:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #matching with removing last character from asctb label
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_author_lower_nospace == ubergraph_cell_label_lower_nospace:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #direct match with cell label author and ubergraph label
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_author_lower_nospace == ubergraph_cell_label_lower_nospace[:-1]:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #matching with removing last character from ontology label
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_author_lower_nospace[:-1] == ubergraph_cell_label_lower_nospace:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #matching with removing last character from asctb label author
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_author_lower_nospace == ubergraph_synonyms_lower_nospace:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #direct match with cell label author and ubergraph synonym
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_author_lower_nospace == ubergraph_synonyms_lower_nospace[:-1]:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #matching with removing last character from ubergraph synonyms
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_author_lower_nospace[:-1] == ubergraph_synonyms_lower_nospace:
-                print("matches:", mismatches_label_lower_nospace )
+                
                 #matching with removing last character from asctb label author
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_lower_nospace in ubergraph_cell_label_lower_nospace:
-                print("matches_sub:", mismatches_label_lower_nospace )
+                
                 #matching substring cell label in ubergraph labels
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_lower_nospace in ubergraph_synonyms_lower_nospace:
-                print("matches_sub:", mismatches_label_lower_nospace )
+                
                 #matching substring cell label in ubergraph synonyms
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_author_lower_nospace in ubergraph_synonyms_lower_nospace:
-                print("matches_sub:", mismatches_label_lower_nospace )
+                
                 #matching substring cell label author in ubergraph synonyms
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif mismatches_label_author_lower_nospace in ubergraph_cell_label_lower_nospace:
-                print("matches_sub:", mismatches_label_lower_nospace )
+                
                 #matching substring cell label author in ubergraph labels
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif ubergraph_cell_label_lower_nospace in mismatches_label_lower_nospace :
-                print("matches_sub:", mismatches_label_lower_nospace )
+                
                 #matching substring ubergraph label in cell labels
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif ubergraph_synonyms_lower_nospace in mismatches_label_lower_nospace :
-                print("matches_sub:", mismatches_label_lower_nospace )
+                
                 #matching substring ubergraph synonym in cell labels
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif ubergraph_synonyms_lower_nospace in mismatches_label_author_lower_nospace:
-                print("matches_sub:", mismatches_label_lower_nospace )
+                
                 #matching substring ubergraph synonym in cell label authors
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
             elif ubergraph_cell_label_lower_nospace in mismatches_label_author_lower_nospace :
-                print("matches_sub:", mismatches_label_lower_nospace )
+                
                 #matching substring ubergraph labels in cell label authors
                 parents_for_label.append(parent_label)
                 labels.append(mismatches_label)
@@ -488,6 +510,6 @@ for ref in config['references']:
 
 print("\n")
 print(parents)
-with pd.ExcelWriter("./Data/.xlsx") as writer:
-    parents.to_excel(writer, sheet_name="Summary", index=False)
+with pd.ExcelWriter("./Data/Parent_asctb.xlsx") as writer:
+    parents.to_excel(writer, sheet_name="data", index=False)
 
