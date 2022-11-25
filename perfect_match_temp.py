@@ -13,10 +13,10 @@ from openpyxl import load_workbook
 notebook_path = os.path.abspath("perfect_match.py")
 
 # Path to config file
-config_path = os.path.join("C:\CNS\Azimuth-asctb-label-comaprison-main2\Data\config.json")
+config_path = os.path.join("C:\CNS\Azimuth-asctb-label-comaprison-main\Data\config.json")
 
 # Path to asctb formatted azimuth data
-az_path = os.path.join("C:\CNS\Azimuth-asctb-label-comaprison-main2\Data")
+az_path = os.path.join("C:\CNS\Azimuth-asctb-label-comaprison-main\Data")
 
 with open(config_path) as config_file:
     config= json.load(config_file)
@@ -31,11 +31,20 @@ def fetch_azimuth(az_url,name):
     else:
         azimuth_df= pd.read_csv (az_url,skiprows=10)
     
+    azimuth_all_label=[]
     azimuth_all_label_author=[]
-  
+    
+    # Filter CT Label column
+    azimuth_label = azimuth_df.filter(regex=("AS/[0-9]/LABEL$"))
+    
     # Filter Author Label column
     azimuth_label_author = azimuth_df.filter(regex=("AS/[0-9]$"))
     
+    # Flatten dataframe to list. Append CT Label in all annotation level to a single list and convert it to dataframe.
+    for col in azimuth_label:
+        azimuth_all_label.extend(azimuth_label[col].tolist())
+    azimuth_all_label=pd.DataFrame(azimuth_all_label)
+    azimuth_all_label.rename(columns = {0:"CT/LABEL"},inplace = True)
     
     # Flatten dataframe to list. Append Author Label in all annotation level to a single list and convert it to dataframe.
     for col in azimuth_label_author:
@@ -43,12 +52,15 @@ def fetch_azimuth(az_url,name):
     azimuth_all_label_author=pd.DataFrame(azimuth_all_label_author)
     azimuth_all_label_author.rename(columns = {0:"CT/LABEL.Author"},inplace = True)
     
+    # Column bind CT/LABEL , CT/Label and Author Label column
+    azimuth_all_cts_label=pd.concat([azimuth_all_label,azimuth_all_label_author],axis=1)
+    
     # Remove duplicate rows
-    azimuth_all_cts_label_unique=azimuth_all_label_author.drop_duplicates()
+    azimuth_all_cts_label_unique=azimuth_all_cts_label.drop_duplicates()
     azimuth_all_cts_label_unique.reset_index(drop=True, inplace=True)
     
     # Return flattend dataframe before and after removing duplicates.
-    return azimuth_all_label_author,azimuth_all_cts_label_unique
+    return azimuth_all_cts_label,azimuth_all_cts_label_unique
 
 # Fetch Asctb Data
 # CT/2 - Represents Author label
@@ -104,8 +116,7 @@ def fetch_asctb(sheet_id,asctb_sheet_name):
 # And if there is a match then we append azimuth row to the list az_row_matched_index and corresponding ASCT+B row number 
 # to asctb_row_matched_index
 
-
-def check_in_asctb(label_az,i,asctb_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_az,str_or_sub):    
+def check_in_asctb(label_az,i,asctb_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_az):    
     
     flag=0
     #removed special character from label_az
@@ -128,60 +139,42 @@ def check_in_asctb(label_az,i,asctb_all_cts_label_unique,az_row_matched_index,as
             # direct matching label_az with astcb label 
             az_row_matched_index.append(i) 
             asctb_row_matched_index.append(j)
-            str_or_sub.append("String Matching")
+            
             flag=1
 
         elif label_az_lower_nospace ==asctb_label_lower_nospace[:-1]:
             #direct matching label_az with astcb label with removing last element in case 's' in asctb label is the last element like Label: "Cell's'"
             az_row_matched_index.append(i) 
             asctb_row_matched_index.append(j)
-            str_or_sub.append("String Matching")
+            
             flag=1
 
         elif label_az_lower_nospace[:-1] == asctb_label_lower_nospace:
             #direct matching label_az with astcb label with removing last element in case 's' in label_az is the last element like Label: "Cell's'"
             az_row_matched_index.append(i) 
             asctb_row_matched_index.append(j)
-            str_or_sub.append("String Matching")
+            
             flag=1
         elif label_az_lower_nospace == asctb_label_author_lower_nospace:
             # direct matching label_az with astcb label author
             az_row_matched_index.append(i) 
             asctb_row_matched_index.append(j)
-            str_or_sub.append("String Matching")
+            
             flag=1
 
         elif label_az_lower_nospace ==asctb_label_author_lower_nospace[:-1]:
             #direct matching label_az with astcb label author with removing last element in case 's' in asctb label is the last element like Label: "Cell's'"
             az_row_matched_index.append(i) 
             asctb_row_matched_index.append(j)
-            str_or_sub.append("String Matching")
+            
             flag=1
 
         elif label_az_lower_nospace[:-1] == asctb_label_author_lower_nospace:
             #direct matching label_az with astcb label author with removing last element in case 's' in label_az is the last element like Label: "Cell's'"
             az_row_matched_index.append(i) 
             asctb_row_matched_index.append(j)
-            str_or_sub.append("String Matching")
+            
             flag=1
-
-        elif label_az_lower_nospace in asctb_label_lower_nospace:
-            # substring matching label_az with astcb label 
-            az_row_matched_index.append(i) 
-            asctb_row_matched_index.append(j)
-            str_or_sub.append("Sub-String Matching")
-            flag=1
-
-       
-
-        elif label_az_lower_nospace in asctb_label_author_lower_nospace:
-            # substring matching label_az with astcb label author
-            az_row_matched_index.append(i) 
-            asctb_row_matched_index.append(j)
-            str_or_sub.append("Sub-String Matching")
-            flag=1
-
-       
 
     if flag==0:
         not_matching_az.append(i)
@@ -194,15 +187,21 @@ def perfect_match_for_azimuthct_in_asctb(azimuth_all_cts_label_unique,asctb_all_
     az_row_matched_index=[]
     asctb_row_matched_index=[]
     not_matching_az=[]
-    str_or_sub =[]
+    
+    for i in range(len(azimuth_all_cts_label_unique['CT/LABEL'])):  
+
+        if azimuth_all_cts_label_unique['CT/LABEL'][i]!="":
+            check_in_asctb(azimuth_all_cts_label_unique['CT/LABEL'][i],i,asctb_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_az)
+        else:
+            not_matching_az.append(i)
 
     for i in range(len(azimuth_all_cts_label_unique['CT/LABEL.Author'])):  
 
         if azimuth_all_cts_label_unique['CT/LABEL.Author'][i]!="":
-            check_in_asctb(azimuth_all_cts_label_unique['CT/LABEL.Author'][i],i,asctb_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_az,str_or_sub)
+            check_in_asctb(azimuth_all_cts_label_unique['CT/LABEL.Author'][i],i,asctb_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_az)
         else:
             not_matching_az.append(i)
-    str_or_sub_1 = pd.DataFrame(str_or_sub, columns =['Matching_Type'])
+
     # Subset Azimuth and ASCTB dataframe by rows were a match is found.
     az_matches_all=azimuth_all_cts_label_unique.loc[az_row_matched_index]
     asctb_matches_all=asctb_all_cts_label_unique.loc[asctb_row_matched_index]
@@ -211,13 +210,13 @@ def perfect_match_for_azimuthct_in_asctb(azimuth_all_cts_label_unique,asctb_all_
     asctb_matches_all.reset_index(drop=True,inplace=True)
     
     
-    az_matches_all.rename(columns = {"CT/LABEL.Author":"AZ.CT/LABEL.Author"},inplace = True)
+    az_matches_all.rename(columns = {"CT/LABEL":"AZ.CT/LABEL","CT/LABEL.Author":"AZ.CT/LABEL.Author"},inplace = True)
     asctb_matches_all.rename(columns = {"CT/LABEL":"ASCTB.CT/LABEL","CT/LABEL.Author":"ASCTB.CT/LABEL.Author"},inplace = True)
 
     # Cbind both dataframes to show the perfect matches found in one dataframe
     
-    perfect_matches_all=pd.concat([az_matches_all,asctb_matches_all,str_or_sub_1],axis=1)
-    perfect_matches_all=perfect_matches_all.drop_duplicates(['AZ.CT/LABEL.Author','ASCTB.CT/LABEL','ASCTB.CT/LABEL.Author'])
+    perfect_matches_all=pd.concat([az_matches_all,asctb_matches_all],axis=1)
+    perfect_matches_all=perfect_matches_all.drop_duplicates()
     perfect_matches_all.reset_index(drop=True, inplace=True)
     
     az_mismatches_all=azimuth_all_cts_label_unique.loc[not_matching_az]
@@ -227,17 +226,7 @@ def perfect_match_for_azimuthct_in_asctb(azimuth_all_cts_label_unique,asctb_all_
     # retrun Perfect matches and azimuth mismatches
     return perfect_matches_all,az_mismatches_all
 
-# Check whether the ASCTB CT LABEL (label_asctb) is present in Azimuth. az_all_cts_label_unique is a dataframe that contains
-# unique CT/LABEL, Label and author label for a reference organ.
 
-# i and j are the index(row number) pointing to corresponding row in ASCT+B and Azimuth dataframe respectively. 
-# i is the row number of label_asctb in Azimuth dataframe.
-# j points to the row number in azimuth where label_asctb matches in Azimuth.
-# az_row_matched_index,asctb_row_matched_index are global lists used to store these the row number of Azimuth, ASCT+B 
-
-# not_matching_asctb is a list storing index of Asctb CT(label_asctb) that does not match to any CT in Azimuth. 
-# And if there is a match then we append Asctb row to the list asctb_row_matched_index and corresponding Azimuth row number 
-# to az_row_matched_index
 def check_in_az(label_asctb,i,az_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_asctb):    
     
     flag=0
@@ -246,44 +235,33 @@ def check_in_az(label_asctb,i,az_all_cts_label_unique,az_row_matched_index,asctb
     #trimmed and converted into lower case
     label_asctb_lower_nospace = label_asctb_cleaned.strip().lower().replace(" ", "") 
     
-    for j in range(len(az_all_cts_label_unique['CT/LABEL.Author'])):
-        
-         #removed special character from asctb label
-        az_label_author_cleaned= re.sub(r"[^a-zA-Z0-9 ]","",az_all_cts_label_unique['CT/LABEL.Author'][j])
-         #trimmed and converted into lower case
-        az_label_author_lower_nospace = az_label_author_cleaned.strip().lower().replace(" ", "")
+    for j in range(len(az_all_cts_label_unique['CT/LABEL'])):
+        #removed special character from azimuth label
+        az_label_cleaned= re.sub(r"[^a-zA-Z0-9 ]","",az_all_cts_label_unique['CT/LABEL'][j]) 
+        #trimmed and converted into lower case
+        az_label_lower_nospace = az_label_cleaned.strip().lower().replace(" ", "") 
 
-        
-
-        if label_asctb_lower_nospace == az_label_author_lower_nospace:
+        if label_asctb_lower_nospace == az_label_lower_nospace:
             # direct matching label_asctb with azimuth label
             az_row_matched_index.append(j) 
             asctb_row_matched_index.append(i)
             flag=1
             break
         
-        elif label_asctb_lower_nospace == az_label_author_lower_nospace[:-1]:
+        elif label_asctb_lower_nospace == az_label_lower_nospace[:-1]:
             #direct matching label_asctb with azimuth label with removing last element in case 's' in azimuth label is the last element like Label: "Cell's'"
             az_row_matched_index.append(j) 
             asctb_row_matched_index.append(i)
             flag=1
             break
         
-        elif label_asctb_lower_nospace[:-1] == az_label_author_lower_nospace:
+        elif label_asctb_lower_nospace[:-1] == az_label_lower_nospace:
             #direct matching label_asctb with azimuth label with removing last element in case 's' in label_asctb is the last element like Label: "Cell's'"
             az_row_matched_index.append(j) 
             asctb_row_matched_index.append(i)
             flag=1
             break
 
-        elif label_asctb_lower_nospace in az_label_author_lower_nospace:
-            # direct matching label_asctb with azimuth label
-            az_row_matched_index.append(j) 
-            asctb_row_matched_index.append(i)
-            flag=1
-            break
-        
-        
     if flag==0:
         not_matching_asctb.append(i)
 
@@ -301,20 +279,13 @@ def perfect_match_for_asctbct_in_azimuth(azimuth_all_cts_label_unique,asctb_all_
         else:
             not_matching_asctb.append(i)
 
-    for i in range(len(asctb_all_cts_label_unique['CT/LABEL.Author'])):
-
-        if asctb_all_cts_label_unique['CT/LABEL.Author'][i]!="":
-            check_in_az(asctb_all_cts_label_unique['CT/LABEL.Author'][i],i,azimuth_all_cts_label_unique,az_row_matched_index,asctb_row_matched_index,not_matching_asctb)
-        else:
-            not_matching_asctb.append(i)
-
     az_matches=azimuth_all_cts_label_unique.loc[az_row_matched_index]
     asctb_matches=asctb_all_cts_label_unique.loc[asctb_row_matched_index]
 
     az_matches.reset_index(drop=True,inplace=True)
     asctb_matches.reset_index(drop=True,inplace=True)
 
-    az_matches.rename(columns = {"CT/LABEL.Author":"AZ.CT/LABEL.Author"},inplace = True)
+    az_matches.rename(columns = {"CT/LABEL":"AZ.CT/LABEL","CT/LABEL.Author":"AZ.CT/LABEL.Author"},inplace = True)
     asctb_matches.rename(columns = {"CT/LABEL":"ASCTB.CT/LABEL","CT/LABEL.Author":"ASCTB.CT/LABEL.Author"},inplace = True)
 
     perfect_matches=pd.concat([asctb_matches,az_matches],axis=1)
@@ -345,11 +316,10 @@ for ref in config['references']:
 
     # Perfect Match and Mismatch for Azimuth CT in ASCTB (AZ - ASCTB)
     azimuth_perfect_matches,azimuth_mismatches=perfect_match_for_azimuthct_in_asctb(azimuth_all_cts_label_unique,asctb_all_cts_label_unique)
-    azimuth_perfect_matches.sort_values(by=['AZ.CT/LABEL.Author'],inplace=True)
+    azimuth_perfect_matches.sort_values(by=['AZ.CT/LABEL','AZ.CT/LABEL.Author'],inplace=True)
 
     # Mismatch for ASCTB CT in Azimuth (ASCTB - Azimuth)
-    asctb_perfect_matches,asctb_mismatches=perfect_match_for_asctbct_in_azimuth(azimuth_all_cts_label_unique,asctb_all_cts_label_unique)
-    asctb_perfect_matches.sort_values(by=['ASCTB.CT/LABEL','ASCTB.CT/LABEL.Author'],inplace=True)
+    #asctb_perfect_matches,asctb_mismatches=perfect_match_for_asctbct_in_azimuth(azimuth_all_cts_label_unique,asctb_all_cts_label_unique)
 #print(azimuth_all_cts_label_unique)  
 #print(asctb_all_cts_label_unique)
 print("\n")
@@ -359,11 +329,9 @@ print("\n")
 print("\n")
 print(azimuth_mismatches)
 
-with pd.ExcelWriter("C:\CNS\Azimuth-asctb-label-comaprison-main2/azimuth_perfect_matches.xlsx") as writer:
+with pd.ExcelWriter("C:\CNS\Azimuth-asctb-label-comaprison-main/azimuth_perfect_matches.xlsx") as writer:
     azimuth_perfect_matches.to_excel(writer, sheet_name="Matched", index=False)
     azimuth_mismatches.to_excel(writer, sheet_name="Not_Matched", index=False)
 
-with pd.ExcelWriter("C:\CNS\Azimuth-asctb-label-comaprison-main2/asctb_perfect_matches.xlsx") as writer:
-    asctb_perfect_matches.to_excel(writer, sheet_name="Matched", index=False)
-    asctb_mismatches.to_excel(writer, sheet_name="Not_Matched", index=False)
+
 
