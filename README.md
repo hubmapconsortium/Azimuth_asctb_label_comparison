@@ -1,4 +1,4 @@
-# Azimuth-asctb-label-comaprison
+# Azimuth-asctb-label-comparison
 
 ## Methodology
 
