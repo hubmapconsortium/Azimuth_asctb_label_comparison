@@ -1,5 +1,9 @@
 # Azimuth-asctb-label-comparison
 
+## Work-flow Venn Diagraph
+
+![alt text](/path/flow.jpg "Optional Title")
+
 ## Methodology
 
 ## Comparison of Azimuth and ASCT+B using Ubergraph to extract parent labels:
