@@ -9,9 +9,9 @@
 ### Cases to match mismatched Labels with Ubergraph Labels:
 * Cleaning the labels – This includes removing spaces, special characters and converting it into lower case.
 * Matching -
-1. Direct matches between ASCTB/Azimuth label authors and Ubergraph Labels.
-2. Direct matches between ASCTB/Azimuth label authors and Ubergraph Synonyms.
-3. Removing the last elements from the above labels for the case of singularity (As label names may be plural. Eg- Cells, muscles)
+1.      Direct matches between ASCTB/Azimuth label authors and Ubergraph Labels.
+2.      Direct matches between ASCTB/Azimuth label authors and Ubergraph Synonyms.
+3.      Removing the last elements from the above labels for the case of singularity (As label names may be plural. Eg- Cells, muscles)
 * Substring Checking:
 1.      Checking if Label or Label author is present in Ubergraph Label or synonyms as a substring
 2.      Checking if Ubergraph Label or Synonym is present in Cell Labels or Label authors as a substring
