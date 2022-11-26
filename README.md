@@ -2,7 +2,7 @@
 
 ## Work-flow Venn Diagraph
 
-![alt text](/path/flow.jpg "Optional Title")
+![alt text](Azimuth_asctb_label_comparison/Data/flow.jpg "Optional Title")
 
 ## Methodology
 
